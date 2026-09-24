@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aula Passo a Passo Quarkus</title>
+<style>
+  :root{--bg:#faf9f6;--surface:#fff;--ink:#1c1d1f;--muted:#5b5e66;--rule:#dcd8cf;--accent:#8a3b2e;--accent-soft:#f3e6e1;--code-bg:#f4f2ec;--code-ink:#2c2a26;--ok:#2c6a3a;--ok-bg:#e3f0dc;--warn-bg:#fbeee0;--warn-ink:#7a4a12;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1a18;--surface:#242220;--ink:#f2efe9;--muted:#b7b2a6;--rule:#3a3733;--accent:#e08a6f;--accent-soft:#3a2620;--code-bg:#1f1e1b;--code-ink:#eae6dd;--ok:#a3d9b1;--ok-bg:#243620;--warn-bg:#3a2f1a;--warn-ink:#e8c07d;}}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.6;margin:0;padding:32px 16px}
+  .page{max-width:800px;margin:0 auto}
+  h1,h2,h3{font-family:Georgia,serif;line-height:1.25}
+  .cover{text-align:center;border-bottom:2px solid var(--rule);padding-bottom:24px;margin-bottom:26px}
+  .kicker{font-family:Consolas,monospace;text-transform:uppercase;letter-spacing:.12em;font-size:12px;color:var(--accent)}
+  .cover h1{font-size:clamp(26px,5vw,36px);margin:8px 0}
+  .cover p{color:var(--muted);max-width:62ch;margin:6px auto;font-size:15px}
+  h2.ex{border-bottom:2px solid var(--accent);padding-bottom:8px;margin:0 0 6px;font-size:22px}
+  h2.ex span{color:var(--accent);margin-right:10px}
+  h3{font-size:16px;margin:20px 0 6px;color:var(--accent)}
+  section.ex{margin-bottom:34px}
+  .prof,.teoria,.alerta,.desafio,.status{border-radius:6px;padding:12px 16px;margin:12px 0;font-size:14.5px;break-inside:avoid}
+  .prof{background:var(--accent-soft);border:1px solid var(--rule)}
+  .prof b.t{font-family:Consolas,monospace;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:4px}
+  .teoria{background:var(--surface);border:1px solid var(--rule)}
+  .alerta{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--rule)}
+  .desafio{background:var(--surface);border:1.5px dashed var(--accent)}
+  .status{background:var(--surface);border:1px solid var(--rule)}
+  p{margin:0 0 8px}
+  pre{background:var(--code-bg);color:var(--code-ink);border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:4px;padding:11px 14px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:12.5px;line-height:1.5;margin:8px 0 12px;break-inside:avoid;white-space:pre-wrap}
+  code{font-family:Consolas,'Courier New',monospace}
+  p code,li code,td code{background:var(--accent-soft);color:var(--accent);padding:1px 5px;border-radius:3px;font-size:.88em}
+  table{border-collapse:collapse;width:100%;margin:8px 0 14px;font-size:13.5px;break-inside:avoid}
+  th,td{border:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+  th{background:var(--surface);font-family:Consolas,monospace;font-size:11px;text-transform:uppercase;color:var(--muted)}
+  .ok{color:var(--ok);font-weight:bold}.no{color:var(--accent);font-weight:bold}
+  ul.check{list-style:none;padding:0;margin:8px 0}
+  ul.check li{padding-left:26px;position:relative;margin-bottom:6px;font-size:14.5px}
+  ul.check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:16px}
+  .linhas{border-bottom:1px solid var(--muted);height:26px;margin:0}
+  footer{text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--rule);padding-top:14px;margin-top:20px}
+  .print-btn{position:fixed;top:16px;right:16px;background:var(--accent);color:#fff;border:none;padding:10px 18px;border-radius:24px;font-family:Consolas,monospace;font-size:12px;cursor:pointer;z-index:10}
+  .pb{break-before:page;page-break-before:always}
+  @media print{
+    .print-btn{display:none}
+    body{background:#fff;color:#000;padding:0;font-size:11pt}
+    .page{max-width:100%}
+    pre{background:#f4f4f4!important;color:#111!important;border-color:#bbb;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:9.5pt}
+    .prof,.alerta,.status{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    h2,h3{break-after:avoid;page-break-after:avoid}
+    p,li{orphans:3;widows:3}
+    a{color:inherit;text-decoration:none}
+  }
+  @page{margin:16mm 14mm}
+</style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Imprimir / Salvar PDF</button>
+<div class="page">
+
+<div class="cover">
+  <div class="kicker">Aula Particular · Quarkus REST</div>
+  <h1>Como resolver o exercício, passo a passo</h1>
+  <p>Este material segue a ordem em que um bom professor ensinaria: primeiro o <b>porquê</b>, depois o <b>como</b>, depois o <b>teste</b>, e só no fim o <b>gabarito</b>. Tente cada desafio sozinho antes de olhar a resposta: é assim que se aprende de verdade.</p>
+  <p><b>Projeto:</b> quarkus-getting-started &nbsp;·&nbsp; <b>Guia base:</b> Guia Quarkus REST (4 exercícios)</p>
+</div>
+
+<!-- ============ PARTE 0 ============ -->
+<section class="ex">
+  <h2 class="ex"><span>0</span>Antes de começar: mapa da aula</h2>
+
+  <div class="prof"><b class="t">Palavras do professor</b>
+  Os 4 exercícios são uma <b>escada</b>: cada degrau usa o anterior. Não pule degraus. Se algo falhar no degrau 3, o erro quase sempre nasceu no degrau 1 ou 2.</div>
+
+  <table>
+    <tr><th>#</th><th>Exercício</th><th>O que você aprende</th><th>Situação no seu projeto</th></tr>
+    <tr><td>1</td><td>Product + ProductResource</td><td>Criar um endpoint REST com filtro (<code>@QueryParam</code>)</td><td class="ok">Feito, com <code>minPrice</code> também</td></tr>
+    <tr><td>2</td><td>REST Client (IUserClient, IPostClient)</td><td>Consumir uma API externa por interface</td><td class="ok">Feito</td></tr>
+    <tr><td>3</td><td>Configuration (<code>mp-rest/url</code>)</td><td>Tirar URLs do código e colocá-las em <code>application.properties</code></td><td class="ok">URLs feitas · falta o desafio <code>@ConfigProperty</code></td></tr>
+    <tr><td>4</td><td>JWT + <code>@RolesAllowed</code></td><td>Proteger rotas por papel (role)</td><td class="no">NÃO feito: falta tudo (chaves, config, LoginResource, AdminResource)</td></tr>
+    <tr><td>+</td><td>Extra: log em arquivo</td><td>Gravar e ajustar o nível dos logs</td><td class="ok">Feito (além do pedido)</td></tr>
+  </table>
+
+  <h3>Como as peças se encaixam</h3>
+  <pre>Navegador/curl ──► ProductResource  (/products)            [Ex.1]
+                 ├─► UserResource ──► IUserClient ──► jsonplaceholder.typicode.com/users   [Ex.2]
+                 │                        ▲
+                 │        application.properties diz a URL base                            [Ex.3]
+                 └─► LoginResource (gera JWT) ──► AdminResource (@RolesAllowed)            [Ex.4]</pre>
+
+  <h3>Ferramentas de que você vai precisar (confira agora)</h3>
+  <ul class="check">
+    <li>VS Code aberto na pasta <code>quarkus-getting-started</code></li>
+    <li>Java 17+ e Maven (no seu PC: <code>C:\Users\rafael-ioppi\apache-maven-3.9.9</code>)</li>
+    <li>Um terminal PowerShell e o programa <code>curl.exe</code></li>
+    <li>OpenSSL (vem junto com o Git for Windows, dentro do <b>Git Bash</b>); será usado só no Exercício 4</li>
+  </ul>
+
+  <div class="alerta"><b>Pegadinha do Windows:</b> no PowerShell, <code>curl</code> é um apelido para <code>Invoke-WebRequest</code> e <b>não aceita</b> as opções <code>-X</code>, <code>-H</code>, <code>-d</code>. Sempre digite <code>curl.exe</code> (com o <code>.exe</code>). Todos os comandos deste material já usam assim.</div>
+
+  <h3>Como subir a aplicação nesta rede (proxy corporativo)</h3>
+  <p>Sua rede exige proxy. O Quarkus não lê o proxy do Windows sozinho, então antes de subir, exporte usuário e senha a partir da variável que o Windows já tem. Faça <b>em todo terminal novo</b>:</p>
+<pre>$uri = [uri]$env:HTTPS_PROXY
+$env:PROXY_USER = $uri.UserInfo.Split(':')[0]
+$env:PROXY_PASSWORD = [uri]::UnescapeDataString($uri.UserInfo.Split(':')[1])
+cd "C:\Users\rafael-ioppi\exercicio 1\quarkus-getting-started"
+&amp; "C:\Users\rafael-ioppi\apache-maven-3.9.9\bin\mvn.cmd" quarkus:dev</pre>
+  <p>Não use <code>.\mvnw.cmd</code>: ele tenta baixar o Maven e leva erro 407 no proxy. Quando aparecer <code>Listening on: http://localhost:8080</code>, está no ar. <b>Deixe esse terminal aberto</b> e use <b>outro terminal</b> para os testes com <code>curl.exe</code>. O modo dev recarrega o código sozinho ao salvar.</p>
+</section>
+
+<!-- ============ EXERCICIO 1 ============ -->
+<section class="ex pb">
+  <h2 class="ex"><span>01</span>Product e ProductResource</h2>
+  <p><i>Tema: Web Services, expor dados por HTTP em formato JSON.</i></p>
+
+  <div class="teoria"><b>Teoria em 30 segundos.</b> REST usa os verbos do HTTP (GET, POST, PUT, DELETE) para agir sobre "recursos". No Quarkus, um recurso é uma classe Java com <code>@Path</code>. O framework converte HTTP ⇄ Java ⇄ JSON para você.</div>
+
+  <h3>Passo 1: Modelar os dados com um <code>record</code></h3>
+  <p><b>Por quê?</b> O produto só carrega dados. Um <code>record</code> gera sozinho construtor, getters (<code>id()</code>, <code>name()</code>...), <code>equals</code>, <code>hashCode</code> e <code>toString</code>, e o Jackson sabe transformá-lo em JSON.</p>
+  <p>Arquivo: <code>src/main/java/org/acme/Product.java</code></p>
+<pre>package org.acme;
+
+public record Product(Long id, String name, String category, Double price) {
+}</pre>
+
+  <h3>Passo 2: Criar o recurso REST</h3>
+  <p><b>Leia cada anotação como uma frase:</b> <code>@Path("/products")</code> = "esta classe atende em /products"; <code>@GET</code> = "responde a requisições GET"; <code>@Produces(JSON)</code> = "devolve JSON"; <code>@QueryParam("category")</code> = "pegue o valor que vem depois de <code>?category=</code> na URL".</p>
+<pre>@Path("/products")
+public class ProductResource {
+
+    private final List&lt;Product&gt; products = List.of(
+        new Product(1L, "Product 1", "Category 1", 10.0),
+        new Product(2L, "Product 2", "Category 2", 20.0),
+        new Product(3L, "Product 3", "Category 3", 300.0));
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List&lt;Product&gt; getProducts(@QueryParam("category") String category) {
+        if (category == null) {
+            return products;
+        }
+        return products.stream()
+            .filter(p -&gt; p.category().equalsIgnoreCase(category))
+            .toList();
+    }
+}</pre>
+  <div class="alerta"><b>Erro clássico:</b> o método precisa ser <code>public</code>. O Quarkus ignora em silêncio métodos sem <code>public</code> e você recebe 404 sem entender o motivo. Também não confunda <code>@QueryParam</code> (lê <code>?x=</code>) com <code>@PathParam</code> (lê <code>/{x}</code>).</div>
+
+  <h3>Passo 3: Testar</h3>
+<pre>curl.exe http://localhost:8080/products
+curl.exe "http://localhost:8080/products?category=Category 1"</pre>
+  <p>Aspas duplas na URL são obrigatórias quando há <code>?</code> ou <code>&amp;</code>. Resultado esperado: o primeiro devolve a lista inteira; o segundo, só os produtos da categoria.</p>
+
+  <div class="desafio"><b>Desafio do professor:</b> acrescente um segundo parâmetro, <code>minPrice</code>, que devolva só produtos com preço <b>maior ou igual</b> ao informado. Teste os dois filtros juntos: <code>/products?category=Category 3&amp;minPrice=100</code>.
+  <br><i>Dica: cada parâmetro é opcional, então cada <code>filter</code> precisa aceitar <code>null</code> ("se for nulo, deixa passar").</i></div>
+
+  <h3>Meu progresso</h3>
+  <ul class="check">
+    <li>Sei a diferença entre <code>@QueryParam</code> e <code>@PathParam</code></li>
+    <li>Sei por que usar <code>record</code></li>
+    <li>Testei sem filtro e com filtro</li>
+    <li>Resolvi o desafio <code>minPrice</code> sozinho</li>
+  </ul>
+</section>
+
+<!-- ============ EXERCICIO 2 ============ -->
+<section class="ex pb">
+  <h2 class="ex"><span>02</span>REST Client: consumindo uma API externa</h2>
+  <p><i>Tema: como um serviço conversa com outro pela rede.</i></p>
+
+  <div class="teoria"><b>Ideia central.</b> Em vez de escrever HTTP "na mão", você <b>declara uma interface</b> Java que descreve a API remota. O Quarkus escreve a implementação por você. Você injeta e chama como se fosse um método local. A API usada aqui é a pública <code>jsonplaceholder.typicode.com</code>.</div>
+
+  <h3>Passo 1: Conferir as dependências no <code>pom.xml</code></h3>
+  <p>Devem existir <code>quarkus-rest-client</code> e <code>quarkus-rest-client-jackson</code>. No seu projeto já estão.</p>
+
+  <h3>Passo 2: O DTO (o "molde" da resposta)</h3>
+<pre>package org.acme;
+
+public record User(Long id, String name, String username, String email) {
+}</pre>
+  <p>Só declare os campos que quer receber; o JSON traz outros e eles são ignorados.</p>
+
+  <h3>Passo 3: A interface do cliente</h3>
+<pre>@RegisterRestClient
+@Path("/users")
+public interface IUserClient {
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    List&lt;User&gt; listUsers();
+}</pre>
+  <div class="alerta"><b>Erro clássico (já ocorreu no seu projeto):</b> <code>@RegisterRestClient</code> vai <b>somente na interface</b>, nunca na classe Resource. Note que não há URL aqui: ela virá do Exercício 3.</div>
+
+  <h3>Passo 4: Injetar e usar</h3>
+<pre>@Path("/local-users")
+public class UserResource {
+
+    @Inject
+    @RestClient
+    IUserClient userClient;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List&lt;User&gt; listLocalUsers() {
+        return userClient.listUsers();
+    }
+}</pre>
+  <p><code>@Inject @RestClient</code> significa: "Quarkus, me entregue a implementação que você gerou para <code>IUserClient</code>".</p>
+
+  <h3>Passo 5: Testar (só funciona depois do Exercício 3!)</h3>
+<pre>curl.exe http://localhost:8080/local-users</pre>
+  <p>Esperado: lista de 10 usuários vinda da internet. Se o Exercício 3 ainda não estiver feito, este teste falha: <b>é normal</b>.</p>
+
+  <div class="desafio"><b>Desafio do professor:</b> crie <code>IPostClient</code> apontando para <code>/posts</code>, com <code>getPost(@PathParam("id") Long id)</code>, e o endpoint <code>GET /local-posts/{id}</code> que devolve o post. Você também precisará do record <code>Post(Long id, Long userId, String title, String body)</code>.
+  <br><i>Teste:</i> <code>curl.exe http://localhost:8080/local-posts/1</code></div>
+
+  <h3>Meu progresso</h3>
+  <ul class="check">
+    <li>Entendi que a interface é só o contrato</li>
+    <li>Sei por que a URL não fica dentro da anotação</li>
+    <li>Testei <code>/local-users</code> e recebi a lista</li>
+    <li>Resolvi o desafio <code>/local-posts/{id}</code></li>
+  </ul>
+</section>
+
+<!-- ============ EXERCICIO 3 ============ -->
+<section class="ex pb">
+  <h2 class="ex"><span>03</span>Configuration: dizendo ao cliente qual URL chamar</h2>
+  <p><i>Tema: como o Quarkus lê propriedades.</i></p>
+
+  <div class="teoria"><b>Por que fora do código?</b> Para trocar o endereço entre desenvolvimento, teste e produção sem recompilar. Ordem de prioridade (da maior para a menor): <b>-D na linha de comando → variável de ambiente → arquivo .env → application.properties</b>.</div>
+
+  <h3>Passo 1: Montar a chave</h3>
+  <p>Fórmula do MicroProfile: <code>{pacote.Interface}/mp-rest/url</code>. Para <code>org.acme.IUserClient</code>:</p>
+<pre>org.acme.IUserClient/mp-rest/url=https://jsonplaceholder.typicode.com</pre>
+
+  <h3>Passo 2: Escrever em <code>src/main/resources/application.properties</code></h3>
+<pre>org.acme.IUserClient/mp-rest/url=https://jsonplaceholder.typicode.com
+org.acme.IPostClient/mp-rest/url=https://jsonplaceholder.typicode.com</pre>
+  <div class="alerta"><b>Atenção:</b> é a URL <b>base</b>. O Quarkus soma o <code>@Path("/users")</code> da interface. <b>Nunca</b> aponte para <code>localhost:8080</code>: o cliente chamaria a própria aplicação e falharia.</div>
+
+  <h3>Passo 3: O proxy da sua rede (específico do seu ambiente)</h3>
+  <p>Como a rede exige proxy, o seu <code>application.properties</code> também contém as linhas <code>quarkus.rest-client."org.acme.IUserClient".proxy-address=...</code> (e as de <code>proxy-user</code> / <code>proxy-password</code>, lidas das variáveis <code>PROXY_USER</code> / <code>PROXY_PASSWORD</code>). A senha <b>nunca</b> deve ser escrita no arquivo.</p>
+
+  <h3>Passo 4: Sobrescrever sem recompilar</h3>
+<pre>mvn.cmd quarkus:dev "-Dorg.acme.IUserClient/mp-rest/url=https://outra-api.com/v1"</pre>
+
+  <h3>Passo 5: Valores por perfil</h3>
+  <p>O prefixo <code>%prod.</code> faz a propriedade valer só em produção (também existem <code>%dev.</code> e <code>%test.</code>):</p>
+<pre>%prod.org.acme.IUserClient/mp-rest/url=https://api.producao.com/v1</pre>
+
+  <div class="desafio"><b>Desafio do professor:</b> (a) em <code>application.properties</code> crie <code>app.mensagem-boas-vindas=Ola, aluno!</code> e uma versão <code>%prod.app.mensagem-boas-vindas=...</code>; (b) crie o endpoint <code>GET /boas-vindas</code> que devolve esse valor usando <code>@ConfigProperty</code>; (c) suba com <code>-Dapp.mensagem-boas-vindas=Valor da linha de comando</code> e confirme que o <code>-D</code> vence o arquivo.
+  <br><i>Import:</i> <code>org.eclipse.microprofile.config.inject.ConfigProperty</code></div>
+
+  <h3>Meu progresso</h3>
+  <ul class="check">
+    <li>Sei montar a chave <code>{pacote.Interface}/mp-rest/url</code></li>
+    <li>Sei a ordem de prioridade das fontes de configuração</li>
+    <li><code>/local-users</code> e <code>/local-posts/1</code> funcionam de verdade</li>
+    <li>Resolvi o desafio <code>/boas-vindas</code></li>
+  </ul>
+</section>
+
+<!-- ============ EXERCICIO 4 ============ -->
+<section class="ex pb">
+  <h2 class="ex"><span>04</span>Segurança com JWT e @RolesAllowed</h2>
+  <p><i>Tema: autenticação e autorização por papéis. <b>Este é o exercício que ainda falta no seu projeto.</b></i></p>
+
+  <div class="teoria"><b>Analogia: a pulseira do festival.</b> Você mostra o documento uma vez na entrada (<b>login</b>) e recebe uma pulseira (<b>token JWT</b>). Em cada área (<b>endpoint</b>), o segurança só olha a pulseira: ela é verificável e diz quais áreas você pode entrar (<b>roles</b>).
+  <br>Um JWT tem 3 partes separadas por ponto: <b>header</b> (algoritmo) · <b>payload</b> (usuário e roles, chamadas de <code>groups</code>) · <b>signature</b> (garante que ninguém alterou o conteúdo).</div>
+
+  <h3>Passo 1: Dependências</h3>
+  <p><b>Já estão no seu pom.xml</b> (<code>quarkus-smallrye-jwt</code> e <code>quarkus-smallrye-jwt-build</code>). Nada a fazer.</p>
+
+  <h3>Passo 2: Gerar o par de chaves RSA</h3>
+  <p><b>Por quê?</b> A chave <b>privada assina</b> o token (fica só com o servidor). A chave <b>pública valida</b> (pode ser distribuída). Abra o <b>Git Bash</b> na pasta do projeto:</p>
+<pre>cd "/c/Users/rafael-ioppi/exercicio 1/quarkus-getting-started/src/main/resources"
+openssl genrsa -out rsaPrivateKey.pem 2048
+openssl pkcs8 -topk8 -nocrypt -inform pem -in rsaPrivateKey.pem -outform pem -out privateKey.pem
+openssl rsa -in rsaPrivateKey.pem -pubout -out publicKey.pem
+rm rsaPrivateKey.pem</pre>
+  <p>Resultado: os arquivos <code>privateKey.pem</code> e <code>publicKey.pem</code> dentro de <code>src/main/resources</code>. (A conversão pkcs8 evita um erro de formato de chave em versões novas do OpenSSL.)</p>
+  <div class="alerta"><b>Segurança:</b> a chave privada <b>nunca</b> vai para um repositório público. Este é um exercício; em produção ela ficaria fora do projeto.</div>
+
+  <h3>Passo 3: Configurar assinatura e validação</h3>
+  <p>Acrescente ao final do <code>application.properties</code>:</p>
+<pre># Assinatura (quem GERA o token: LoginResource)
+smallrye.jwt.sign.key.location=privateKey.pem
+
+# Validacao (quem RECEBE o token: @RolesAllowed)
+mp.jwt.verify.issuer=https://acme.org/issuer
+mp.jwt.verify.publickey.location=publicKey.pem</pre>
+  <p>O <code>issuer</code> aqui e o usado no código do Passo 4 precisam ser <b>exatamente a mesma string</b>.</p>
+
+  <h3>Passo 4: Endpoint que gera o token (login)</h3>
+  <p>Arquivo: <code>src/main/java/org/acme/LoginResource.java</code>. <code>@PermitAll</code> libera o endpoint sem token (afinal, é aqui que você ainda não o tem).</p>
+<pre>package org.acme;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import io.smallrye.jwt.build.Jwt;
+import jakarta.annotation.security.PermitAll;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/login")
+public class LoginResource {
+
+    private static final String ISSUER = "https://acme.org/issuer";
+
+    @POST
+    @PermitAll
+    @Produces(MediaType.TEXT_PLAIN)
+    public String generate(final String username) {
+        Set&lt;String&gt; roles = new HashSet&lt;&gt;();
+        roles.add("admin");
+        return Jwt.issuer(ISSUER)
+            .upn(username)
+            .groups(roles)
+            .expiresIn(3600)
+            .sign();
+    }
+}</pre>
+
+  <h3>Passo 5: Endpoint protegido</h3>
+  <p>Arquivo: <code>AdminResource.java</code>. Com <code>@RolesAllowed("admin")</code>, o Quarkus intercepta a chamada <b>antes</b> do seu código: lê o header <code>Authorization: Bearer &lt;token&gt;</code>, valida a assinatura com a chave pública e confere se <code>"admin"</code> está em <code>groups</code>. Você não escreve nenhum <code>if</code>.</p>
+<pre>package org.acme;
+
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/admin")
+public class AdminResource {
+
+    @GET
+    @RolesAllowed("admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String adminOnly() {
+        return "Acesso liberado: voce tem a role admin";
+    }
+}</pre>
+
+  <h3>Passo 6: Testar os três cenários (PowerShell)</h3>
+  <table>
+    <tr><th>Cenário</th><th>Comando</th><th>Esperado</th></tr>
+    <tr><td>1. Gerar token</td><td><code>$TOKEN = curl.exe -s -X POST -d "rafael" http://localhost:8080/login</code></td><td>200 + texto longo (o JWT)</td></tr>
+    <tr><td>2. Sem token</td><td><code>curl.exe -i http://localhost:8080/admin</code></td><td><b>401</b> Unauthorized</td></tr>
+    <tr><td>3. Com token</td><td><code>curl.exe -H "Authorization: Bearer $TOKEN" http://localhost:8080/admin</code></td><td><b>200</b> + mensagem</td></tr>
+  </table>
+  <p>Dica: cole o token em <b>jwt.io</b> para ver o payload. Você verá <code>upn: rafael</code> e <code>groups: ["admin"]</code>.</p>
+
+  <h3>Quando der errado (tabela de diagnóstico)</h3>
+  <table>
+    <tr><th>Sintoma</th><th>Causa provável</th><th>Solução</th></tr>
+    <tr><td>401 mesmo com token</td><td>Faltou <code>Bearer </code> (com espaço) no header</td><td>Enviar exatamente <code>Bearer &lt;token&gt;</code></td></tr>
+    <tr><td>401 logo após gerar</td><td><code>mp.jwt.verify.issuer</code> diferente do <code>ISSUER</code> do código</td><td>Deixar as duas strings idênticas</td></tr>
+    <tr><td>403 Forbidden</td><td>Token válido, mas sem a role exigida</td><td>Conferir <code>.groups(roles)</code></td></tr>
+    <tr><td>Erro ao iniciar citando "key location"</td><td>.pem fora de <code>src/main/resources</code> ou mal gerado</td><td>Refazer o Passo 2</td></tr>
+    <tr><td><code>curl</code> reclama de parâmetro</td><td>Usou <code>curl</code> em vez de <code>curl.exe</code> no PowerShell</td><td>Usar <code>curl.exe</code></td></tr>
+  </table>
+
+  <div class="desafio"><b>Desafio do professor:</b> crie a role <code>gerente</code> e o endpoint <code>GET /relatorios</code> protegido com <code>@RolesAllowed({"admin","gerente"})</code>. Gere um token <b>só com</b> <code>gerente</code> e confirme: acessa <code>/relatorios</code> (200) mas leva <b>403</b> em <code>/admin</code>.
+  <br><i>Dica:</i> hoje o <code>LoginResource</code> sempre põe <code>admin</code>. Faça o papel depender de um dado recebido (por exemplo, criar um segundo endpoint <code>/login-gerente</code>, ou ler o nome do usuário).</div>
+
+  <h3>Meu progresso</h3>
+  <ul class="check">
+    <li>Sei as 3 partes de um JWT</li>
+    <li>Sei a diferença entre chave privada (assina) e pública (valida)</li>
+    <li>Testei: login → token → acesso 200</li>
+    <li>Testei a falha: sem token → 401</li>
+    <li>Resolvi o desafio <code>gerente</code> (200 em /relatorios, 403 em /admin)</li>
+  </ul>
+</section>
+
+<!-- ============ EXTRA ============ -->
+<section class="ex pb">
+  <h2 class="ex"><span>+</span>Extra: log em arquivo (além do exercício)</h2>
+  <p><i>Tema: acompanhar o que a aplicação está fazendo. Isto <b>não</b> era pedido no guia; foi um acréscimo feito no seu projeto.</i></p>
+
+  <div class="teoria"><b>Para que serve?</b> Por padrão o Quarkus só escreve o log no terminal, que se perde ao fechá-lo. Com estas propriedades, tudo também é gravado em um arquivo, e as mensagens do seu próprio pacote (<code>org.acme</code>) aparecem com mais detalhe (nível <code>DEBUG</code>).</div>
+
+  <h3>Passo 1: Acrescentar ao <code>application.properties</code></h3>
+<pre>quarkus.log.file.enable=true
+quarkus.log.file.path=target/quarkus.log
+quarkus.log.level=INFO
+quarkus.log.category."org.acme".level=DEBUG</pre>
+  <table>
+    <tr><th>Propriedade</th><th>O que faz</th></tr>
+    <tr><td><code>quarkus.log.file.enable</code></td><td>Liga a gravação do log em arquivo</td></tr>
+    <tr><td><code>quarkus.log.file.path</code></td><td>Onde o arquivo fica (aqui, <code>target/quarkus.log</code>)</td></tr>
+    <tr><td><code>quarkus.log.level</code></td><td>Nível geral: <code>INFO</code> mostra o essencial de todas as bibliotecas</td></tr>
+    <tr><td><code>quarkus.log.category."org.acme".level</code></td><td>Nível só para o seu código: <code>DEBUG</code> mostra mais detalhes</td></tr>
+  </table>
+
+  <h3>Passo 2: Testar</h3>
+  <p>Suba a aplicação, faça algumas chamadas (por exemplo <code>curl.exe http://localhost:8080/products</code>) e abra o arquivo:</p>
+<pre>Get-Content "C:\Users\rafael-ioppi\exercicio 1\quarkus-getting-started\target\quarkus.log" -Tail 20</pre>
+  <div class="alerta"><b>Atenção:</b> o arquivo fica dentro de <code>target/</code>, pasta apagada por <code>mvn clean</code>. É normal: o log é recriado na próxima execução.</div>
+
+  <h3>Meu progresso</h3>
+  <ul class="check">
+    <li>Sei a diferença entre o nível geral e o nível por pacote</li>
+    <li>Encontrei e li o arquivo <code>target/quarkus.log</code></li>
+  </ul>
+</section>
+
+<!-- ============ GABARITO ============ -->
+<section class="ex pb">
+  <h2 class="ex"><span>★</span>Gabarito dos desafios (só depois de tentar!)</h2>
+  <div class="prof"><b class="t">Palavras do professor</b> Errar e depurar faz parte do aprendizado. Compare a sua solução com esta só depois de ter tentado por, no mínimo, 15 minutos.</div>
+
+  <h3>Ex. 1: filtro por <code>minPrice</code></h3>
+<pre>@GET
+@Produces(MediaType.APPLICATION_JSON)
+public List&lt;Product&gt; getProducts(@QueryParam("category") String category,
+                                 @QueryParam("minPrice") Double minPrice) {
+    return products.stream()
+        .filter(p -&gt; category == null || p.category().equalsIgnoreCase(category))
+        .filter(p -&gt; minPrice == null || p.price() &gt;= minPrice)
+        .toList();
+}</pre>
+
+  <h3>Ex. 2: IPostClient e /local-posts/{id}</h3>
+<pre>@RegisterRestClient
+@Path("/posts")
+public interface IPostClient {
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    Post getPost(@PathParam("id") Long id);
+}
+
+@Path("/local-posts")
+public class PostResource {
+    @Inject @RestClient IPostClient postClient;
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Post getLocalPost(@PathParam("id") Long id) {
+        return postClient.getPost(id);
+    }
+}</pre>
+
+  <h3>Ex. 3: /boas-vindas com @ConfigProperty</h3>
+<pre># application.properties
+app.mensagem-boas-vindas=Ola, aluno!
+%prod.app.mensagem-boas-vindas=Bem-vindo a producao!
+
+// BoasVindasResource.java
+@Path("/boas-vindas")
+public class BoasVindasResource {
+
+    @ConfigProperty(name = "app.mensagem-boas-vindas")
+    String mensagem;
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String get() {
+        return mensagem;
+    }
+}</pre>
+  <p>Teste com <code>-Dapp.mensagem-boas-vindas="Valor da linha de comando"</code>: o <code>-D</code> vence o arquivo, confirmando a ordem de prioridade.</p>
+
+  <h3>Ex. 4: role gerente</h3>
+<pre>// LoginGerenteResource.java (classe nova, nao mexe no LoginResource)
+@Path("/login-gerente")
+public class LoginGerenteResource {
+    @POST
+    @PermitAll
+    @Produces(MediaType.TEXT_PLAIN)
+    public String generate(final String username) {
+        return Jwt.issuer("https://acme.org/issuer").upn(username)
+            .groups(Set.of("gerente")).expiresIn(3600).sign();
+    }
+}
+
+// RelatorioResource.java
+@Path("/relatorios")
+public class RelatorioResource {
+    @GET
+    @RolesAllowed({"admin", "gerente"})
+    @Produces(MediaType.TEXT_PLAIN)
+    public String relatorio() { return "Relatorio confidencial"; }
+}</pre>
+    <table>
+    <tr><th>Teste</th><th>Resultado esperado</th></tr>
+    <tr><td>Token gerente → <code>/relatorios</code></td><td class="ok">200</td></tr>
+    <tr><td>Token gerente → <code>/admin</code></td><td class="no">403</td></tr>
+    <tr><td>Token admin → <code>/relatorios</code> e <code>/admin</code></td><td class="ok">200 nos dois</td></tr>
+    <tr><td>Sem token → qualquer um dos dois</td><td class="no">401</td></tr>
+  </table>
+</section>
+
+<!-- ============ CHECKLIST FINAL ============ -->
+<section class="ex">
+  <h2 class="ex"><span>✔</span>Revisão final e anotações</h2>
+  <h3>Cinco perguntas de prova (responda sem consultar)</h3>
+  <p>1) Qual a diferença entre <code>@QueryParam</code> e <code>@PathParam</code>?</p><div class="linhas"></div><div class="linhas"></div>
+  <p style="margin-top:10px">2) Por que <code>@RegisterRestClient</code> vai na interface e a URL vai no <code>application.properties</code>?</p><div class="linhas"></div><div class="linhas"></div>
+  <p style="margin-top:10px">3) Em que ordem o Quarkus procura uma propriedade (-D, variável de ambiente, .env, application.properties)?</p><div class="linhas"></div><div class="linhas"></div>
+  <p style="margin-top:10px">4) Qual a diferença entre erro 401 e 403?</p><div class="linhas"></div><div class="linhas"></div>
+  <p style="margin-top:10px">5) Por que a chave privada assina e a pública valida, e não o contrário?</p><div class="linhas"></div><div class="linhas"></div>
+
+  <details open style="margin-top:14px"><summary style="cursor:pointer;color:var(--accent);font-weight:bold">Respostas curtas</summary>
+  <p>1) <code>@QueryParam</code> lê <code>?x=1</code> na URL; <code>@PathParam</code> lê o pedaço do caminho <code>/{id}</code>. 2) A interface é o contrato e a URL muda por ambiente, então fica fora do código. 3) -D → variável de ambiente → .env → application.properties. 4) 401 = não autenticado (sem token válido); 403 = autenticado, mas sem permissão (role errada). 5) Só o servidor pode criar tokens (privada, secreta), mas qualquer serviço deve poder conferi-los (pública, distribuível).</p></details>
+</section>
+
+<footer>Material didático · projeto quarkus-getting-started · imprima ou salve como PDF pelo botão no topo.</footer>
+</div>
+</body>
+</html>

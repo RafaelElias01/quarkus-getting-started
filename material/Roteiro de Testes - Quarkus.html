@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roteiro de Testes Quarkus</title>
+<style>
+  :root{--bg:#faf9f6;--surface:#fff;--ink:#1c1d1f;--muted:#5b5e66;--rule:#dcd8cf;--accent:#8a3b2e;--accent-soft:#f3e6e1;--code-bg:#f4f2ec;--code-ink:#2c2a26;--ok:#2c6a3a;--warn-bg:#fbeee0;--warn-ink:#7a4a12;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1a18;--surface:#242220;--ink:#f2efe9;--muted:#b7b2a6;--rule:#3a3733;--accent:#e08a6f;--accent-soft:#3a2620;--code-bg:#1f1e1b;--code-ink:#eae6dd;--ok:#a3d9b1;--warn-bg:#3a2f1a;--warn-ink:#e8c07d;}}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.6;margin:0;padding:32px 16px}
+  .page{max-width:800px;margin:0 auto}
+  h1,h2,h3{line-height:1.25}
+  .cover{text-align:center;border-bottom:2px solid var(--rule);padding-bottom:22px;margin-bottom:24px}
+  .kicker{font-family:Consolas,monospace;text-transform:uppercase;letter-spacing:.12em;font-size:12px;color:var(--accent)}
+  .cover h1{font-size:clamp(26px,5vw,34px);margin:8px 0}
+  .cover p{color:var(--muted);max-width:62ch;margin:6px auto;font-size:15px}
+  h2{border-bottom:2px solid var(--accent);padding-bottom:8px;margin:0 0 8px;font-size:21px}
+  h2 span{color:var(--accent);margin-right:10px}
+  h3{font-size:16px;margin:18px 0 6px;color:var(--accent)}
+  section{margin-bottom:30px}
+  .alerta,.nota{border-radius:6px;padding:12px 16px;margin:12px 0;font-size:14.5px;break-inside:avoid;border:1px solid var(--rule)}
+  .alerta{background:var(--warn-bg);color:var(--warn-ink)}
+  .nota{background:var(--accent-soft)}
+  p{margin:0 0 8px}
+  pre{background:var(--code-bg);color:var(--code-ink);border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:4px;padding:11px 14px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:12.5px;line-height:1.5;margin:8px 0 12px;break-inside:avoid;white-space:pre-wrap}
+  code{font-family:Consolas,'Courier New',monospace}
+  p code,li code,td code{background:var(--accent-soft);color:var(--accent);padding:1px 5px;border-radius:3px;font-size:.88em}
+  table{border-collapse:collapse;width:100%;margin:8px 0 14px;font-size:13.5px;break-inside:avoid}
+  th,td{border:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+  th{background:var(--surface);font-family:Consolas,monospace;font-size:11px;text-transform:uppercase;color:var(--muted)}
+  ul.check{list-style:none;padding:0;margin:8px 0}
+  ul.check li{padding-left:26px;position:relative;margin-bottom:6px;font-size:14.5px}
+  ul.check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:16px}
+  footer{text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--rule);padding-top:14px;margin-top:20px}
+  .print-btn{position:fixed;top:16px;right:16px;background:var(--accent);color:#fff;border:none;padding:10px 18px;border-radius:24px;font-family:Consolas,monospace;font-size:12px;cursor:pointer;z-index:10}
+  .pb{break-before:page;page-break-before:always}
+  @media print{
+    .print-btn{display:none}
+    body{background:#fff;color:#000;padding:0;font-size:11pt}
+    pre{background:#f4f4f4!important;color:#111!important;border-color:#bbb;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:9.5pt}
+    .nota,.alerta{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    h2,h3{break-after:avoid;page-break-after:avoid}
+  }
+  @page{margin:16mm 14mm}
+</style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Imprimir / Salvar PDF</button>
+<div class="page">
+
+<div class="cover">
+  <div class="kicker">Roteiro de Testes · Quarkus REST</div>
+  <h1>Como testar o projeto, passo a passo</h1>
+  <p>Siga na ordem. Em cada teste há o comando, o resultado esperado e um quadradinho para marcar. Se algo não bater, use a tabela de problemas no final.</p>
+  <p><b>Projeto:</b> quarkus-getting-started</p>
+</div>
+
+<section>
+  <h2><span>1</span>Preparação</h2>
+  <div class="alerta"><b>Use dois terminais PowerShell.</b> O <b>Terminal A</b> fica com a aplicação rodando (não feche). O <b>Terminal B</b> executa os testes. No PowerShell use sempre <code>curl.exe</code> (com <code>.exe</code>), nunca só <code>curl</code>.</div>
+
+  <h3>Terminal A: subir a aplicação (com o proxy da rede)</h3>
+<pre>$uri = [uri]$env:HTTPS_PROXY
+$env:PROXY_USER = $uri.UserInfo.Split(':')[0]
+$env:PROXY_PASSWORD = [uri]::UnescapeDataString($uri.UserInfo.Split(':')[1])
+cd "C:\Users\rafael-ioppi\exercicio 1\quarkus-getting-started"
+&amp; "C:\Users\rafael-ioppi\apache-maven-3.9.9\bin\mvn.cmd" quarkus:dev</pre>
+  <p>Espere aparecer <code>Listening on: http://localhost:8080</code>. Não use <code>.\mvnw.cmd</code> (erro 407 no proxy).</p>
+  <ul class="check">
+    <li>Aplicação no ar, sem erros vermelhos no Terminal A</li>
+  </ul>
+</section>
+
+<section class="pb">
+  <h2><span>2</span>Testes que já devem funcionar</h2>
+  <p>Todos no <b>Terminal B</b>.</p>
+
+  <h3>Teste 1: lista de produtos (sem filtro)</h3>
+<pre>curl.exe http://localhost:8080/products</pre>
+  <p><b>Esperado:</b> JSON com 3 produtos (ids 1, 2 e 3).</p>
+  <ul class="check"><li>Vieram os 3 produtos</li></ul>
+
+  <h3>Teste 2: filtro por categoria</h3>
+<pre>curl.exe "http://localhost:8080/products?category=Category 1"</pre>
+  <p><b>Esperado:</b> só o produto 1. Atenção: a comparação diferencia maiúsculas de minúsculas.</p>
+  <ul class="check"><li>Veio só o Product 1</li></ul>
+
+  <h3>Teste 3: filtro por preço mínimo</h3>
+<pre>curl.exe "http://localhost:8080/products?minPrice=15"</pre>
+  <p><b>Esperado:</b> produtos 2 (20.0) e 3 (300.0).</p>
+  <ul class="check"><li>Vieram os produtos 2 e 3</li></ul>
+
+  <h3>Teste 4: os dois filtros juntos</h3>
+<pre>curl.exe "http://localhost:8080/products?category=Category 3&amp;minPrice=100"</pre>
+  <p><b>Esperado:</b> só o produto 3. Teste também <code>minPrice=500</code> com a mesma categoria: deve voltar <code>[]</code>.</p>
+  <ul class="check"><li>Produto 3 no primeiro e lista vazia no segundo</li></ul>
+
+  <h3>Teste 5: REST Client de usuários (API externa)</h3>
+<pre>curl.exe http://localhost:8080/local-users</pre>
+  <p><b>Esperado:</b> 10 usuários (id, name, username, email) vindos de jsonplaceholder.typicode.com.</p>
+  <ul class="check"><li>Vieram 10 usuários</li></ul>
+
+  <h3>Teste 6: REST Client de posts</h3>
+<pre>curl.exe http://localhost:8080/local-posts/1
+curl.exe http://localhost:8080/local-posts/5</pre>
+  <p><b>Esperado:</b> um objeto com <code>id</code>, <code>userId</code>, <code>title</code> e <code>body</code>, com o id pedido.</p>
+  <ul class="check"><li>Post 1 e post 5 retornaram corretamente</li></ul>
+
+  <h3>Teste 7: configuração por linha de comando</h3>
+  <p>Pare a aplicação (Ctrl+C no Terminal A) e suba de novo apontando para uma URL errada:</p>
+<pre>&amp; "C:\Users\rafael-ioppi\apache-maven-3.9.9\bin\mvn.cmd" quarkus:dev "-Dorg.acme.IUserClient/mp-rest/url=https://url-que-nao-existe.invalid"
+curl.exe -i http://localhost:8080/local-users</pre>
+  <p><b>Esperado:</b> erro 500. Isso prova que o <code>-D</code> vence o <code>application.properties</code>. Volte a subir normalmente depois.</p>
+  <ul class="check"><li>Deu erro com a URL falsa e voltou ao normal sem ela</li></ul>
+
+  <h3>Teste 8: log em arquivo (extra)</h3>
+<pre>Get-Content "C:\Users\rafael-ioppi\exercicio 1\quarkus-getting-started\target\quarkus.log" -Tail 20</pre>
+  <p><b>Esperado:</b> linhas de log recentes, incluindo a inicialização da aplicação.</p>
+  <ul class="check"><li>Arquivo existe e tem conteúdo</li></ul>
+</section>
+
+<section class="pb">
+  <h2><span>3</span>Testes de erro (comportamento esperado)</h2>
+  <table>
+    <tr><th>Comando</th><th>Esperado</th></tr>
+    <tr><td><code>curl.exe -i http://localhost:8080/nao-existe</code></td><td>404 Not Found</td></tr>
+    <tr><td><code>curl.exe -i "http://localhost:8080/products?minPrice=abc"</code></td><td>404 (valor não numérico em <code>Double</code>)</td></tr>
+    <tr><td><code>curl.exe -i http://localhost:8080/local-posts/99999</code></td><td>Erro 500 (a API externa devolve 404 e o projeto não trata)</td></tr>
+  </table>
+  <ul class="check"><li>As três respostas bateram com a tabela</li></ul>
+</section>
+
+<section>
+  <h2><span>4</span>Ainda não implementado no projeto</h2>
+  <div class="nota">Estes itens do material didático <b>não existem</b> no código atual. Só teste depois de implementá-los; hoje eles dão 404.</div>
+  <table>
+    <tr><th>Item</th><th>Endpoint</th><th>Como testar quando existir</th></tr>
+    <tr><td>Ex. 3: desafio <code>@ConfigProperty</code></td><td><code>GET /boas-vindas</code></td><td><code>curl.exe http://localhost:8080/boas-vindas</code> deve devolver a mensagem do properties</td></tr>
+    <tr><td>Ex. 4: JWT</td><td><code>/login</code>, <code>/admin</code></td>
+      <td><code>$TOKEN = curl.exe -s -X POST -d "rafael" http://localhost:8080/login</code><br><code>curl.exe -i http://localhost:8080/admin</code> → 401<br><code>curl.exe -H "Authorization: Bearer $TOKEN" http://localhost:8080/admin</code> → 200</td></tr>
+    <tr><td>Ex. 4: desafio gerente</td><td><code>/login-gerente</code>, <code>/relatorios</code></td><td>Token gerente: 200 em <code>/relatorios</code> e 403 em <code>/admin</code></td></tr>
+  </table>
+</section>
+
+<section class="pb">
+  <h2><span>5</span>Se algo der errado</h2>
+  <table>
+    <tr><th>Sintoma</th><th>Causa provável</th><th>Solução</th></tr>
+    <tr><td>Erro 407 ao subir ou nos testes de API externa</td><td>Variáveis <code>PROXY_USER</code>/<code>PROXY_PASSWORD</code> não definidas neste terminal</td><td>Repetir as 3 primeiras linhas da Preparação</td></tr>
+    <tr><td><code>curl</code> reclama de <code>-X</code> ou <code>-H</code></td><td>Usou <code>curl</code> em vez de <code>curl.exe</code></td><td>Usar <code>curl.exe</code></td></tr>
+    <tr><td><code>Connection refused</code></td><td>Aplicação não está no ar</td><td>Conferir o Terminal A</td></tr>
+    <tr><td><code>/local-users</code> dá 500</td><td>Sem internet/proxy ou URL do properties errada</td><td>Ver <code>target/quarkus.log</code> e o <code>application.properties</code></td></tr>
+    <tr><td>Porta 8080 ocupada</td><td>Outra instância rodando</td><td>Fechar a outra ou usar <code>-Dquarkus.http.port=8081</code></td></tr>
+  </table>
+</section>
+
+<footer>Roteiro de testes · projeto quarkus-getting-started · imprima ou salve como PDF pelo botão no topo.</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Guia Quarkus REST</title>
+<style>
+  :root{
+    --bg:#faf9f6;
+    --surface:#ffffff;
+    --ink:#1c1d1f;
+    --muted:#5b5e66;
+    --rule:#dcd8cf;
+    --accent:#8a3b2e;
+    --accent-soft:#f3e6e1;
+    --code-bg:#f4f2ec;
+    --code-ink:#2c2a26;
+    --step-num:#8a3b2e;
+    --warn-bg:#fbeee0;
+    --warn-ink:#7a4a12;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1b1a18;
+      --surface:#242220;
+      --ink:#f2efe9;
+      --muted:#b7b2a6;
+      --rule:#3a3733;
+      --accent:#e08a6f;
+      --accent-soft:#3a2620;
+      --code-bg:#1f1e1b;
+      --code-ink:#eae6dd;
+      --step-num:#e08a6f;
+      --warn-bg:#3a2f1a;
+      --warn-ink:#e8c07d;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1b1a18; --surface:#242220; --ink:#f2efe9; --muted:#b7b2a6; --rule:#3a3733;
+    --accent:#e08a6f; --accent-soft:#3a2620; --code-bg:#1f1e1b; --code-ink:#eae6dd;
+    --step-num:#e08a6f; --warn-bg:#3a2f1a; --warn-ink:#e8c07d;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size:16px; line-height:1.65;
+    padding-inline:16px; padding-block:32px; max-width:100%;
+  }
+  .page{max-width:800px; margin:0 auto;}
+  h1,h2,h3{font-family:'Fraunces', Georgia, serif; font-weight:600; line-height:1.25; color:var(--ink);}
+  h3{font-size:16.5px; margin:22px 0 6px;}
+
+  .cover{text-align:center; padding-block:24px 36px; border-bottom:2px solid var(--rule); margin-bottom:28px;}
+  .cover .kicker{font-family:'JetBrains Mono', monospace; text-transform:uppercase; letter-spacing:.12em; font-size:12px; color:var(--accent); margin-bottom:10px;}
+  .cover h1{font-size:clamp(26px,5vw,38px); margin:0 0 10px;}
+  .cover p{color:var(--muted); font-size:14.5px; max-width:62ch; margin:0 auto;}
+  .fonte{
+    display:inline-block; margin-top:14px; font-family:'JetBrains Mono',monospace;
+    font-size:11.5px; color:var(--accent); background:var(--accent-soft);
+    padding:4px 10px; border-radius:20px;
+  }
+
+  .toc{background:var(--surface); border:1px solid var(--rule); border-radius:6px; padding:18px 22px; margin-bottom:36px;}
+  .toc h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 10px;}
+  .toc ol{margin:0; padding-left:20px;}
+  .toc li{margin-bottom:5px; font-family:'JetBrains Mono',monospace; font-size:13px;}
+  .toc a{color:var(--ink); text-decoration:none; border-bottom:1px dotted var(--rule);}
+
+  section.exercicio{break-inside:avoid-page; margin-bottom:40px; padding-bottom:6px;}
+  .ex-head{display:flex; align-items:baseline; gap:14px; border-bottom:2px solid var(--accent); padding-bottom:10px; margin-bottom:6px;}
+  .ex-num{font-family:'Fraunces',serif; font-size:32px; font-weight:700; color:var(--step-num); line-height:1;}
+  .ex-head h2{font-size:20px; margin:0;}
+  .ex-sub{color:var(--muted); font-size:13.5px; margin:0 0 18px; font-style:italic;}
+
+  .teoria{
+    background:var(--surface); border:1px solid var(--rule); border-radius:6px;
+    padding:14px 18px; margin-bottom:18px; font-size:14.5px;
+  }
+  .teoria p{margin:0 0 8px;}
+  .teoria p:last-child{margin-bottom:0;}
+  .teoria strong{color:var(--accent);}
+
+  .passo{margin-bottom:18px; break-inside:avoid;}
+  .passo-title{
+    font-family:'JetBrains Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--accent); margin-bottom:6px; display:flex; align-items:center; gap:8px;
+  }
+  .passo-title::before{content:""; width:8px; height:8px; background:var(--accent); border-radius:50%; display:inline-block; flex:none;}
+  .passo p{margin:0 0 8px; color:var(--ink);}
+  .passo p.explica{color:var(--muted); font-size:14px;}
+
+  pre{
+    background:var(--code-bg); color:var(--code-ink); border:1px solid var(--rule); border-left:4px solid var(--accent);
+    border-radius:4px; padding:13px 15px; overflow-x:auto; font-family:'JetBrains Mono','Courier New',monospace;
+    font-size:12px; line-height:1.55; break-inside:avoid; margin:8px 0 14px;
+  }
+  code{font-family:'JetBrains Mono','Courier New',monospace;}
+  p code, li code, td code{background:var(--accent-soft); color:var(--accent); padding:1px 5px; border-radius:3px; font-size:.88em;}
+
+  .caixa{background:var(--accent-soft); border:1px solid var(--rule); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:13.5px;}
+  .caixa strong{color:var(--accent);}
+  .alerta{background:var(--warn-bg); border:1px solid var(--rule); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:13.5px; color:var(--warn-ink);}
+  .alerta strong{color:var(--warn-ink);}
+
+  .checklist{list-style:none; padding:0; margin:10px 0;}
+  .checklist li{padding-left:24px; position:relative; margin-bottom:6px; font-size:14px;}
+  .checklist li::before{content:"☐"; position:absolute; left:0; top:0; color:var(--accent); font-size:15px;}
+
+  .desafio{
+    background:var(--surface); border:1.5px dashed var(--accent); border-radius:6px;
+    padding:14px 18px; margin:16px 0 4px; font-size:14px; break-inside:avoid;
+  }
+  .desafio-title{
+    font-family:'JetBrains Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--accent); margin-bottom:6px; font-weight:600;
+  }
+  .desafio p{margin:0 0 6px;}
+  .desafio p:last-child{margin-bottom:0;}
+
+  .fluxo{
+    background:var(--surface); border:1px solid var(--rule); border-radius:6px;
+    padding:20px 18px; margin-bottom:36px; break-inside:avoid;
+  }
+  .fluxo h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 16px; text-align:center;}
+  .fluxo-linha{display:flex; align-items:stretch; flex-wrap:wrap; gap:6px; justify-content:center;}
+  .fluxo-caixa{
+    flex:1 1 150px; max-width:180px; border:1.5px solid var(--accent); border-radius:6px;
+    padding:10px 12px; text-align:center; background:var(--accent-soft);
+  }
+  .fluxo-caixa .num{font-family:'Fraunces',serif; font-weight:700; color:var(--step-num); font-size:15px; display:block;}
+  .fluxo-caixa .titulo{font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; display:block; margin:2px 0;}
+  .fluxo-caixa .desc{font-size:11px; color:var(--muted); display:block;}
+  .fluxo-seta{display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:20px; flex:0 0 20px;}
+  @media (max-width:600px){
+    .fluxo-linha{flex-direction:column;}
+    .fluxo-seta{transform:rotate(90deg); margin:2px 0;}
+    .fluxo-caixa{max-width:100%;}
+  }
+
+  table{border-collapse:collapse; width:100%; margin:8px 0 16px; font-size:13px;}
+  th,td{border:1px solid var(--rule); padding:6px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--surface); font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);}
+
+  .jwt-anatomia{display:flex; gap:6px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:11.5px; margin:10px 0;}
+  .jwt-anatomia span{padding:6px 10px; border-radius:4px; border:1px solid var(--rule);}
+  .jwt-anatomia .h{background:#dce7f5; color:#1c3a5e;}
+  .jwt-anatomia .p{background:#e3f0dc; color:#2c4a1c;}
+  .jwt-anatomia .s{background:#f5dcdc; color:#5e1c1c;}
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) .jwt-anatomia .h{background:#233348;color:#a9c6ea;}
+    :root:not([data-theme="light"]) .jwt-anatomia .p{background:#243620;color:#b7d9a3;}
+    :root:not([data-theme="light"]) .jwt-anatomia .s{background:#3a2323;color:#e6b3b3;}
+  }
+  :root[data-theme="dark"] .jwt-anatomia .h{background:#233348;color:#a9c6ea;}
+  :root[data-theme="dark"] .jwt-anatomia .p{background:#243620;color:#b7d9a3;}
+  :root[data-theme="dark"] .jwt-anatomia .s{background:#3a2323;color:#e6b3b3;}
+
+  footer{text-align:center; color:var(--muted); font-size:12px; border-top:1px solid var(--rule); padding-top:16px; margin-top:20px;}
+
+  .print-btn{
+    position:fixed; top:16px; right:16px; background:var(--accent); color:#fff; border:none;
+    padding:10px 18px; border-radius:24px; font-family:'JetBrains Mono',monospace; font-size:12px;
+    cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.2); z-index:10;
+  }
+
+  @media print{
+    .print-btn{display:none;}
+    body{background:#fff; padding:0; font-size:11.5pt;}
+    .page{max-width:100%;}
+    .toc{border:1px solid #ccc;}
+    section.exercicio{page-break-after:always;}
+    section.exercicio:last-of-type{page-break-after:auto;}
+    pre{background:#f4f4f4 !important; color:#111 !important; border-color:#ccc; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .caixa{background:#f2ece9 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .alerta{background:#fbeee0 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .teoria{background:#fff !important;}
+
+    .passo, .desafio, .fluxo, .teoria, .caixa, .alerta, pre, table, .jwt-anatomia, .ex-head, .toc{
+      break-inside:avoid; page-break-inside:avoid;
+    }
+    thead{display:table-header-group;}
+    h1, h2, h3, .passo-title, .desafio-title{
+      break-after:avoid; page-break-after:avoid;
+    }
+    p, li{orphans:3; widows:3;}
+  }
+  @media (max-width:480px){ .ex-num{font-size:24px;} pre{font-size:11px;} }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Guia de Estudos · Quarkus REST</div>
+    <h1>Do CRUD simples à segurança com JWT</h1>
+    <p>Passo a passo teórico + prático: recurso REST com filtro por query param, REST Client para consumir API externa, configuração de endpoint no estilo MicroProfile e proteção de rota por role usando JSON Web Token.</p>
+    <div class="fonte">modelo didático baseado em pw2.rpmhub.dev</div>
+  </div>
+
+  <div class="toc">
+    <h2>Sumário</h2>
+    <ol>
+      <li><a href="#ex1">Exercício 1 — Product e ProductResource (Web Services)</a></li>
+      <li><a href="#ex2">Exercício 2 — REST Client (IUserClient)</a></li>
+      <li><a href="#ex3">Exercício 3 — Configuration: mp-rest/url</a></li>
+      <li><a href="#ex4">Exercício 4 — Segurança com JWT e @RolesAllowed</a></li>
+    </ol>
+  </div>
+
+  <div class="fluxo">
+    <h2>Como os 4 exercícios se encaixam</h2>
+    <div class="fluxo-linha">
+      <div class="fluxo-caixa">
+        <span class="num">01</span>
+        <span class="titulo">ProductResource</span>
+        <span class="desc">expõe /products com filtro por categoria</span>
+      </div>
+      <div class="fluxo-seta">→</div>
+      <div class="fluxo-caixa">
+        <span class="num">02</span>
+        <span class="titulo">IUserClient</span>
+        <span class="desc">busca /users em uma API externa</span>
+      </div>
+      <div class="fluxo-seta">→</div>
+      <div class="fluxo-caixa">
+        <span class="num">03</span>
+        <span class="titulo">application.properties</span>
+        <span class="desc">diz ao IUserClient qual URL chamar</span>
+      </div>
+      <div class="fluxo-seta">→</div>
+      <div class="fluxo-caixa">
+        <span class="num">04</span>
+        <span class="titulo">LoginResource → AdminResource</span>
+        <span class="desc">gera o JWT e só libera quem tem role admin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCÍCIO 1 -->
+  <section class="exercicio" id="ex1">
+    <div class="ex-head">
+      <span class="ex-num">01</span>
+      <h2>Product e ProductResource 🌐</h2>
+    </div>
+    <p class="ex-sub">Tema: Web Services — expor dados via HTTP/JSON usando JAX-RS.</p>
+
+    <div class="teoria">
+      <p><strong>O que é um Web Service REST?</strong> É uma forma de dois sistemas conversarem pela internet usando o protocolo HTTP. Em vez de trocar mensagens em XML complexo (como no antigo padrão SOAP/WSDL), o REST usa os próprios verbos HTTP — <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code> — para representar ações sobre <strong>recursos</strong> (no nosso caso, produtos).</p>
+      <p>No Quarkus, cada recurso é uma classe Java anotada com <code>@Path</code>. O framework (JAX-RS / RESTEasy Reactive) cuida de toda a conversão HTTP ⇄ Java ⇄ JSON — você só escreve a lógica de negócio.</p>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 1 — Modelar o produto como record</div>
+      <p class="explica">Como o <code>Product</code> só carrega dados (não tem comportamento próprio), o jeito moderno e idiomático em Java é usar um <strong>record</strong>: uma classe imutável onde o compilador gera automaticamente construtor, getters (<code>id()</code>, <code>name()</code>, <code>category()</code>), <code>equals()</code>, <code>hashCode()</code> e <code>toString()</code>. É exatamente o padrão que a apostila usa para o <code>Produto</code>.</p>
+      <pre>package org.acme;
+
+public record Product(Long id, String name, String category) {
+}</pre>
+      <div class="caixa"><strong>Por que record e não classe com campos públicos?</strong> Menos código repetido, imutabilidade por padrão (mais seguro) e o Jackson (motor de JSON do Quarkus) já sabe serializar/desserializar records automaticamente.</div>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 2 — Criar o recurso REST</div>
+      <p class="explica"><code>@Path("/products")</code> na classe define a rota base. O método marcado com <code>@GET</code> responde a requisições HTTP GET; <code>@Produces(MediaType.APPLICATION_JSON)</code> avisa o cliente que a resposta vem em JSON. O parâmetro <code>@QueryParam("category")</code> captura o valor depois do <code>?category=</code> na URL — é opcional por natureza (chega <code>null</code> se não for informado).</p>
+      <pre>package org.acme;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/products")
+public class ProductResource {
+
+    private final List&lt;Product&gt; products = List.of(
+        new Product(1L, "Notebook", "Eletronicos"),
+        new Product(2L, "Mouse", "Eletronicos"),
+        new Product(3L, "Cadeira", "Moveis"),
+        new Product(4L, "Mesa", "Moveis"));
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List&lt;Product&gt; getProducts(@QueryParam("category") String category) {
+        if (category == null) {
+            return products;
+        }
+        return products.stream()
+            .filter(p -&gt; p.category().equalsIgnoreCase(category))
+            .collect(Collectors.toList());
+    }
+}</pre>
+      <div class="alerta">🚨 <strong>Dúvida comum:</strong> <code>@QueryParam</code> lê da URL (<code>?category=x</code>), enquanto <code>@PathParam</code> lê de dentro do caminho (<code>/products/{id}</code>). Não confunda os dois — são mecanismos diferentes para capturar dados da requisição.</div>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 3 — Testar os dois cenários</div>
+      <table>
+        <tr><th>Requisição</th><th>O que acontece internamente</th><th>Resultado</th></tr>
+        <tr><td><code>GET /products</code></td><td><code>category</code> chega como <code>null</code> → cai no <code>if</code> → retorna a lista completa</td><td>4 produtos</td></tr>
+        <tr><td><code>GET /products?category=Eletronicos</code></td><td><code>category</code> = "Eletronicos" → filtra o stream</td><td>Notebook e Mouse</td></tr>
+      </table>
+      <pre>curl http://localhost:8080/products
+curl "http://localhost:8080/products?category=Eletronicos"</pre>
+    </div>
+
+    <ul class="checklist">
+      <li>Entendi a diferença entre @QueryParam e @PathParam</li>
+      <li>Sei por que usar record em vez de classe com campos públicos</li>
+      <li>Testei os dois endpoints e confirmei o filtro funcionando</li>
+    </ul>
+
+    <div class="desafio">
+      <div class="desafio-title">🧠 Agora tente você</div>
+      <p>Adicione um segundo <code>@QueryParam</code> chamado <code>minPrice</code> (você vai precisar acrescentar um atributo <code>price</code> ao record <code>Product</code>) e filtre a lista para retornar apenas produtos com preço maior ou igual ao informado. Teste combinando os dois filtros ao mesmo tempo: <code>/products?category=Eletronicos&amp;minPrice=1000</code>.</p>
+    </div>
+  </section>
+
+  <!-- EXERCÍCIO 2 -->
+  <section class="exercicio" id="ex2">
+    <div class="ex-head">
+      <span class="ex-num">02</span>
+      <h2>REST Client para consumir /users 🛠️</h2>
+    </div>
+    <p class="ex-sub">Tema: Rest Client — como um microsserviço fala com outro (ou com uma API externa).</p>
+
+    <div class="teoria">
+      <p><strong>Por que preciso disso?</strong> Em arquiteturas de microsserviços (e no exercício, ao consumir uma API pública de usuários), um serviço quase sempre precisa chamar outro pela rede. Fazer isso "na mão" com <code>HttpClient</code> significa escrever manualmente URL, headers, serialização e desserialização — repetitivo e propenso a erro.</p>
+      <p>O <strong>MicroProfile Rest Client</strong> resolve isso de um jeito elegante: você declara uma <em>interface Java</em> descrevendo os endpoints remotos (com as mesmas anotações JAX-RS que já usamos no Exercício 1) e o Quarkus <strong>gera a implementação automaticamente</strong> em tempo de build. Você injeta e usa como se fosse um serviço local.</p>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 1 — Dependências (já presentes no projeto)</div>
+      <pre>&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-rest-client&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-rest-client-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 2 — Criar o DTO de resposta</div>
+      <p class="explica">Assim como o <code>Product</code>, o <code>User</code> é só um "carregador de dados" vindo da API externa — outro candidato perfeito a <code>record</code>.</p>
+      <pre>package org.acme;
+
+public record User(Long id, String name, String username, String email) {
+}</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 3 — Declarar a interface do cliente</div>
+      <p class="explica">Seguindo a convenção da apostila (interfaces de Rest Client com prefixo <code>I</code>, como <code>IPayment</code> e <code>IBookCatalog</code>), criamos <code>IUserClient</code>. A anotação <code>@RegisterRestClient</code> diz ao Quarkus "gere uma implementação HTTP para esta interface". Repare que <strong>não</strong> colocamos <code>baseUri</code> na anotação — a URL virá de fora, no <code>application.properties</code> (Exercício 3), o que é a prática recomendada para não deixar endereços fixos no código.</p>
+      <pre>package org.acme;
+
+import java.util.List;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+@RegisterRestClient
+@Path("/users")
+public interface IUserClient {
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    List&lt;User&gt; listUsers();
+}</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 4 — Injetar e usar</div>
+      <p class="explica">A anotação <code>@RestClient</code> (junto com <code>@Inject</code>) diz ao CDI (o mecanismo de injeção de dependências do Quarkus) "me dê a implementação gerada para <code>IUserClient</code>". A partir daí, chamar <code>userClient.listUsers()</code> é indistinguível de chamar um método local — toda a complexidade de HTTP fica escondida.</p>
+      <pre>package org.acme;
+
+import java.util.List;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+
+@Path("/local-users")
+public class UserResource {
+
+    @Inject
+    @RestClient
+    IUserClient userClient;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List&lt;User&gt; getUsers() {
+        return userClient.listUsers();
+    }
+}</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Resumo do processo (4 passos)</div>
+      <table>
+        <tr><th>Passo</th><th>O que faz</th></tr>
+        <tr><td>1</td><td>Garantir as dependências rest-client no pom.xml</td></tr>
+        <tr><td>2</td><td>Criar o DTO (record) que representa a resposta remota</td></tr>
+        <tr><td>3</td><td>Declarar a interface com @RegisterRestClient + anotações JAX-RS</td></tr>
+        <tr><td>4</td><td>Injetar com @Inject @RestClient e configurar a URL fora do código</td></tr>
+      </table>
+    </div>
+
+    <ul class="checklist">
+      <li>Entendi que a interface só declara o contrato — o Quarkus implementa</li>
+      <li>Sei por que a URL não fica hardcoded na anotação</li>
+      <li>Testei /local-users e recebi a lista vinda da API externa</li>
+    </ul>
+
+    <div class="desafio">
+      <div class="desafio-title">🧠 Agora tente você</div>
+      <p>Crie uma segunda interface, <code>IPostClient</code>, apontando para <code>/posts</code> na mesma API pública, com um método <code>getPost(@PathParam("id") Long id)</code>. Exponha um endpoint próprio, <code>GET /local-posts/{id}</code>, que injete essa interface e devolva o post correspondente.</p>
+    </div>
+  </section>
+
+  <!-- EXERCÍCIO 3 -->
+  <section class="exercicio" id="ex3">
+    <div class="ex-head">
+      <span class="ex-num">03</span>
+      <h2>Configuration: apontando o endpoint 🔧</h2>
+    </div>
+    <p class="ex-sub">Tema: Configuration — como o Quarkus lê propriedades e como isso se conecta ao Rest Client.</p>
+
+    <div class="teoria">
+      <p><strong>Onde ficam as configurações?</strong> O Quarkus (via MicroProfile Config) busca valores em várias fontes, na seguinte ordem de prioridade: parâmetros <code>-D</code> na linha de comando, variáveis de ambiente, arquivo <code>.env</code> na raiz do projeto e, por fim, <code>src/main/resources/application.properties</code>. Isso permite trocar um endpoint entre ambientes (dev/test/prod) sem recompilar o código.</p>
+      <p><strong>Chave específica do Rest Client:</strong> o MicroProfile define um formato padronizado para configurar a URL base de uma interface sem precisar de anotação: <code>{pacote-completo.NomeDaInterface}/mp-rest/url</code>.</p>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 1 — Montar a chave de configuração</div>
+      <p class="explica">Como nossa interface é <code>org.acme.IUserClient</code>, a chave fica:</p>
+      <pre>{pacote}.{Interface}/mp-rest/url = {url base}
+org.acme.IUserClient/mp-rest/url = https://jsonplaceholder.typicode.com</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 2 — Adicionar ao application.properties</div>
+      <pre># Configuracao do REST Client (interface IUserClient) - padrao MicroProfile
+org.acme.IUserClient/mp-rest/url=https://jsonplaceholder.typicode.com
+# Configuracao do REST Client (interface IPostClient) - padrao MicroProfile
+org.acme.IPostClient/mp-rest/url=https://jsonplaceholder.typicode.com</pre>
+      <div class="alerta">🚨 <strong>Atenção:</strong> a URL configurada aqui é a <em>base</em>. O caminho final é composto com o <code>@Path("/users")</code> (ou <code>@Path("/posts")</code>) da interface, resultando em <code>https://jsonplaceholder.typicode.com/users</code> na hora da chamada real. Não aponte essa URL para <code>http://localhost:8080/...</code> — isso faria o client chamar a própria aplicação em vez da API pública, e a chamada falharia porque não existe nenhum recurso <code>/users</code> ou <code>/posts</code> exposto localmente.</div>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 3 — Sobrescrever em runtime (sem recompilar)</div>
+      <p class="explica">Qualquer propriedade pode ser sobrescrita na hora de subir a aplicação — útil para trocar de ambiente rapidamente:</p>
+      <pre>./mvnw compile quarkus:dev -Dorg.acme.IUserClient/mp-rest/url=https://outra-api.com/v1</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 4 — Variação por perfil (dev/test/prod)</div>
+      <p class="explica">O Quarkus permite prefixar uma propriedade com <code>%perfil.</code> para que ela só valha naquele ambiente específico:</p>
+      <pre>org.acme.IUserClient/mp-rest/url=https://jsonplaceholder.typicode.com
+%prod.org.acme.IUserClient/mp-rest/url=https://api.producao.com/v1</pre>
+    </div>
+
+    <ul class="checklist">
+      <li>Entendi o formato {pacote.Interface}/mp-rest/url</li>
+      <li>Sei sobrescrever uma propriedade via linha de comando</li>
+      <li>Sei diferenciar valores por perfil com %prod./%dev.</li>
+    </ul>
+
+    <div class="desafio">
+      <div class="desafio-title">🧠 Agora tente você</div>
+      <p>Adicione ao <code>application.properties</code> uma propriedade própria, <code>app.mensagem-boas-vindas</code>, injete-a com <code>@ConfigProperty</code> em um novo endpoint <code>GET /boas-vindas</code> e defina um valor diferente só para o perfil <code>%prod</code>. Rode em modo dev sobrescrevendo o valor via <code>-D</code> na linha de comando para confirmar a prioridade.</p>
+    </div>
+  </section>
+
+  <!-- EXERCÍCIO 4 -->
+  <section class="exercicio" id="ex4">
+    <div class="ex-head">
+      <span class="ex-num">04</span>
+      <h2>Restringindo acesso com JWT + @RolesAllowed 🔑</h2>
+    </div>
+    <p class="ex-sub">Tema: JSON Web Token — autenticação e autorização baseada em papéis (roles).</p>
+
+    <div class="teoria">
+      <p><strong>O que é um JWT?</strong> É um padrão (RFC 7519) para representar informações de forma compacta e assinada digitalmente, usado para controlar o acesso a serviços. Pense nele como a <strong>pulseira de um festival</strong>: depois que você mostra sua identidade uma vez na entrada (login), recebe uma pulseira (o token) que carrega, de forma verificável, quais áreas você pode acessar — sem precisar mostrar documento de novo em cada barraca.</p>
+      <p>Um JWT tem 3 partes separadas por ponto: <strong>header</strong> (algoritmo usado), <strong>payload</strong> (as informações/claims, como o usuário e suas roles) e <strong>signature</strong> (garante que ninguém alterou o conteúdo no caminho).</p>
+      <div class="jwt-anatomia">
+        <span class="h">eyJhbGciOiJSUzI1NiJ9</span><span>.</span>
+        <span class="p">eyJ1cG4iOiJyYWZhZWwiLCJncm91cHMiOlsiYWRtaW4iXX0</span><span>.</span>
+        <span class="s">SflKxwRJSMeKKF2QT4f...</span>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted)">header (algoritmo) · payload (usuário + roles = "groups") · signature (integridade)</p>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 1 — Adicionar as extensões de segurança JWT</div>
+      <p class="explica"><code>quarkus-smallrye-jwt</code> valida tokens recebidos (necessário para <code>@RolesAllowed</code> funcionar); <code>quarkus-smallrye-jwt-build</code> permite <em>gerar</em> tokens dentro da própria aplicação — útil para o exercício, já que não temos um servidor de autenticação externo (como Keycloak).</p>
+      <pre>&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-jwt&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-jwt-build&lt;/artifactId&gt;
+&lt;/dependency&gt;</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 2 — Gerar o par de chaves RSA</div>
+      <p class="explica">A assinatura do token usa criptografia assimétrica: a <strong>chave privada</strong> assina (fica só no servidor que gera o token), a <strong>chave pública</strong> valida (pode ser distribuída). Geramos as duas com OpenSSL e colocamos em <code>src/main/resources</code>:</p>
+      <pre>openssl genrsa -out privateKey.pem 2048
+openssl rsa -in privateKey.pem -pubout -out publicKey.pem</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 3 — Configurar assinatura e validação</div>
+      <pre># Assinatura (usada por quem GERA o token — LoginResource)
+smallrye.jwt.sign.key.location=privateKey.pem
+
+# Validacao (usada por quem RECEBE o token — @RolesAllowed)
+mp.jwt.verify.issuer=https://acme.org/issuer
+mp.jwt.verify.publickey.location=publicKey.pem</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 4 — Endpoint que gera o token (login)</div>
+      <p class="explica"><code>@PermitAll</code> libera este endpoint sem exigir autenticação — faz sentido, já que é aqui que o usuário ainda "não tem" o token. O método usa a API fluente <code>Jwt.issuer(...)</code> para montar o token e inclui a role <code>admin</code> dentro de <code>.groups(...)</code> — é exatamente essa lista de "groups" que o Quarkus compara com o valor de <code>@RolesAllowed</code>.</p>
+      <pre>package org.acme;
+
+import java.util.HashSet;
+import java.util.Set;
+import jakarta.annotation.security.PermitAll;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import io.smallrye.jwt.build.Jwt;
+
+@Path("/login")
+public class LoginResource {
+
+    private static final String ISSUER = "https://acme.org/issuer";
+
+    @POST
+    @PermitAll
+    @Produces(MediaType.TEXT_PLAIN)
+    public String generate(final String username) {
+        Set&lt;String&gt; roles = new HashSet&lt;&gt;();
+        roles.add("admin");
+
+        return Jwt.issuer(ISSUER)
+            .upn(username)
+            .groups(roles)
+            .sign();
+    }
+}</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 5 — Proteger o endpoint com @RolesAllowed</div>
+      <p class="explica">Ao anotar o método com <code>@RolesAllowed("admin")</code>, o Quarkus intercepta a chamada <em>antes</em> de executar o corpo do método: extrai o JWT do header <code>Authorization: Bearer &lt;token&gt;</code>, valida a assinatura com a chave pública e confere se <code>"admin"</code> está entre os <code>groups</code> do token. Se algo falhar, a resposta é automática — não precisamos escrever nenhum <code>if</code>.</p>
+      <pre>package org.acme;
+
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/admin")
+public class AdminResource {
+
+    @GET
+    @RolesAllowed("admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String adminOnly() {
+        return "Acesso liberado: voce tem a role admin";
+    }
+}</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-title">Passo 6 — Testar o fluxo completo</div>
+      <table>
+        <tr><th>Cenário</th><th>Comando</th><th>Resultado esperado</th></tr>
+        <tr><td>1. Gerar o token</td><td><code>curl -X POST -d "rafael" localhost:8080/login</code></td><td>200 OK + string do JWT</td></tr>
+        <tr><td>2. Chamar sem token</td><td><code>curl localhost:8080/admin</code></td><td>401 Unauthorized</td></tr>
+        <tr><td>3. Chamar com token</td><td><code>curl -H "Authorization: Bearer $TOKEN" localhost:8080/admin</code></td><td>200 OK</td></tr>
+      </table>
+      <pre>TOKEN=$(curl -s -X POST -d "rafael" http://localhost:8080/login)
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/admin</pre>
+    </div>
+
+    <div class="caixa"><strong>Anotações de segurança úteis:</strong>
+      <table style="margin-top:8px">
+        <tr><th>Anotação</th><th>Efeito</th></tr>
+        <tr><td><code>@PermitAll</code></td><td>Libera o acesso sem exigir token</td></tr>
+        <tr><td><code>@RolesAllowed("admin")</code></td><td>Exige token válido com a role/group informado</td></tr>
+        <tr><td><code>@DenyAll</code></td><td>Bloqueia o acesso para todo mundo</td></tr>
+        <tr><td><code>@Inject JsonWebToken</code></td><td>Permite ler claims do token dentro do método</td></tr>
+      </table>
+    </div>
+
+    <div class="alerta">🚨 <strong>Para produção:</strong> gerar tokens dentro da própria aplicação (como fizemos) é didático, mas em um cenário real o ideal é delegar autenticação a um provedor dedicado, como Keycloak, via extensão <code>quarkus-oidc</code> — o restante (<code>@RolesAllowed</code>) continua funcionando exatamente da mesma forma.</div>
+
+    <div class="passo">
+      <div class="passo-title">O que pode dar errado</div>
+      <p class="explica">JWT costuma ser a parte onde alunos mais travam. Antes de "sair tentando", confira esta tabela:</p>
+      <table>
+        <tr><th>Sintoma</th><th>Causa provável</th><th>Como resolver</th></tr>
+        <tr><td>401 mesmo enviando o token</td><td><code>Authorization</code> sem o prefixo <code>Bearer </code> (com espaço)</td><td>Enviar exatamente <code>Bearer &lt;token&gt;</code>, respeitando maiúscula e o espaço</td></tr>
+        <tr><td>401 logo depois de gerar o token</td><td><code>mp.jwt.verify.issuer</code> diferente do <code>Jwt.issuer(...)</code> usado para assinar</td><td>Os dois valores precisam ser <strong>idênticos</strong> (mesma string)</td></tr>
+        <tr><td>403 Forbidden (não 401)</td><td>Token válido, mas sem a role certa dentro de <code>groups</code></td><td>Conferir se <code>.groups(roles)</code> realmente inclui <code>"admin"</code></td></tr>
+        <tr><td>Erro ao iniciar a aplicação citando "key location"</td><td><code>privateKey.pem</code>/<code>publicKey.pem</code> não estão em <code>src/main/resources</code></td><td>Gerar as chaves com OpenSSL e colocá-las nesse diretório</td></tr>
+        <tr><td>Token expira rápido demais nos testes</td><td>Duração padrão do claim <code>exp</code> é curta</td><td>Usar <code>.expiresIn(3600)</code> no builder do <code>Jwt.issuer(...)</code> durante o desenvolvimento</td></tr>
+      </table>
+    </div>
+
+    <ul class="checklist">
+      <li>Entendi as 3 partes de um JWT (header, payload, signature)</li>
+      <li>Sei a diferença entre chave privada (assina) e pública (valida)</li>
+      <li>Testei o fluxo completo: login → token → acesso liberado</li>
+      <li>Testei o cenário de falha: sem token → 401</li>
+    </ul>
+
+    <div class="desafio">
+      <div class="desafio-title">🧠 Agora tente você</div>
+      <p>Crie uma segunda role, <code>gerente</code>, e um novo endpoint <code>GET /relatorios</code> protegido com <code>@RolesAllowed({"admin", "gerente"})</code> (aceitando as duas roles). Depois gere um token só com <code>"gerente"</code> em <code>groups</code> e confirme que ele acessa <code>/relatorios</code> mas continua recebendo 403 em <code>/admin</code>.</p>
+    </div>
+  </section>
+
+  <footer>
+    Guia de estudo pessoal — projeto <code>quarkus-getting-started</code> · modelo didático inspirado em pw2.rpmhub.dev · imprima ou salve como PDF pelo botão no topo.
+  </footer>
+
+</div>
+
+</body></html>

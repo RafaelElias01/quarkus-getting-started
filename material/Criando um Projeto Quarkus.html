@@ -1,0 +1,189 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Criando um Projeto Quarkus</title>
+<style>
+  :root{
+    --bg:#faf9f6; --surface:#ffffff; --ink:#1c1d1f; --muted:#5b5e66; --rule:#dcd8cf;
+    --accent:#8a3b2e; --accent-soft:#f3e6e1; --code-bg:#f4f2ec; --code-ink:#2c2a26; --step-num:#8a3b2e;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1b1a18; --surface:#242220; --ink:#f2efe9; --muted:#b7b2a6; --rule:#3a3733;
+      --accent:#e08a6f; --accent-soft:#3a2620; --code-bg:#1f1e1b; --code-ink:#eae6dd; --step-num:#e08a6f;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1b1a18; --surface:#242220; --ink:#f2efe9; --muted:#b7b2a6; --rule:#3a3733;
+    --accent:#e08a6f; --accent-soft:#3a2620; --code-bg:#1f1e1b; --code-ink:#eae6dd; --step-num:#e08a6f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size:16px; line-height:1.65; padding-inline:16px; padding-block:32px; max-width:100%;
+  }
+  .page{max-width:760px; margin:0 auto;}
+  h1,h2,h3{font-family:'Fraunces', Georgia, serif; font-weight:600; line-height:1.25; color:var(--ink);}
+
+  .cover{text-align:center; padding-block:20px 32px; border-bottom:2px solid var(--rule); margin-bottom:28px;}
+  .cover .kicker{font-family:'JetBrains Mono', monospace; text-transform:uppercase; letter-spacing:.12em; font-size:12px; color:var(--accent); margin-bottom:10px;}
+  .cover h1{font-size:clamp(24px,5vw,34px); margin:0 0 10px;}
+  .cover p{color:var(--muted); font-size:14.5px; max-width:58ch; margin:0 auto;}
+  .fonte{
+    display:inline-block; margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:11.5px;
+    color:var(--accent); background:var(--accent-soft); padding:4px 10px; border-radius:20px;
+  }
+
+  .passo{margin-bottom:22px; break-inside:avoid; border-bottom:1px solid var(--rule); padding-bottom:18px;}
+  .passo:last-of-type{border-bottom:none;}
+  .passo-head{display:flex; align-items:center; gap:12px; margin-bottom:8px;}
+  .passo-num{
+    font-family:'Fraunces',serif; font-weight:700; font-size:22px; color:var(--step-num);
+    background:var(--accent-soft); border-radius:50%; width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .passo-head h2{font-size:17px; margin:0;}
+  .passo p{margin:0 0 8px; font-size:14.5px;}
+  .passo p.explica{color:var(--muted);}
+
+  pre{
+    background:var(--code-bg); color:var(--code-ink); border:1px solid var(--rule); border-left:4px solid var(--accent);
+    border-radius:4px; padding:12px 15px; overflow-x:auto; font-family:'JetBrains Mono','Courier New',monospace;
+    font-size:12.5px; line-height:1.55; break-inside:avoid; margin:8px 0;
+  }
+  code{font-family:'JetBrains Mono','Courier New',monospace;}
+  p code, td code{background:var(--accent-soft); color:var(--accent); padding:1px 5px; border-radius:3px; font-size:.88em;}
+
+  table{border-collapse:collapse; width:100%; margin:8px 0 4px; font-size:13.5px;}
+  th,td{border:1px solid var(--rule); padding:6px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--surface); font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);}
+
+  .checklist{list-style:none; padding:0; margin:8px 0 0;}
+  .checklist li{padding-left:24px; position:relative; margin-bottom:6px; font-size:14px;}
+  .checklist li::before{content:"☐"; position:absolute; left:0; top:0; color:var(--accent); font-size:15px;}
+  .checklist .old{color:var(--muted); font-size:.85em;}
+
+  .caixa{background:var(--accent-soft); border:1px solid var(--rule); border-radius:6px; padding:12px 16px; margin:10px 0; font-size:13.5px;}
+  .caixa strong{color:var(--accent);}
+
+  .alternativa{
+    background:var(--surface); border:1px dashed var(--rule); border-radius:6px;
+    padding:14px 18px; margin-top:28px; font-size:13.5px;
+  }
+  .alternativa h3{font-size:14px; margin:0 0 8px;}
+
+  footer{text-align:center; color:var(--muted); font-size:12px; border-top:1px solid var(--rule); padding-top:16px; margin-top:26px;}
+
+  .print-btn{
+    position:fixed; top:16px; right:16px; background:var(--accent); color:#fff; border:none;
+    padding:10px 18px; border-radius:24px; font-family:'JetBrains Mono',monospace; font-size:12px;
+    cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.2); z-index:10;
+  }
+
+  @media print{
+    .print-btn{display:none;}
+    body{background:#fff; padding:0; font-size:11.5pt;}
+    .page{max-width:100%;}
+    pre{background:#f4f4f4 !important; color:#111 !important; border-color:#ccc; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .caixa{background:#f2ece9 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+
+    .passo, .cover, .alternativa, .caixa, pre, table, .checklist li{
+      break-inside:avoid; page-break-inside:avoid;
+    }
+    .passo-head, h1, h2, h3{
+      break-after:avoid; page-break-after:avoid;
+    }
+    thead{display:table-header-group;}
+    p, li{orphans:3; widows:3;}
+  }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Guia Rápido · Quarkus</div>
+    <h1>Criando um projeto Quarkus no VSCode</h1>
+    <p>Passo a passo para gerar um novo projeto Quarkus usando a extensão oficial do VSCode, do zero até a primeira execução em modo dev.</p>
+    <div class="fonte">modelo didático baseado em pw2.rpmhub.dev</div>
+  </div>
+
+  <div class="passo">
+    <div class="passo-head"><span class="passo-num">1</span><h2>Instalar a extensão do Quarkus</h2></div>
+    <p class="explica">No VSCode, abra a aba de extensões e procure pela extensão oficial da Red Hat.</p>
+    <table>
+      <tr><th>Onde</th><th>Como</th></tr>
+      <tr><td>Atalho</td><td><code>Ctrl+Shift+X</code></td></tr>
+      <tr><td>Buscar por</td><td><code>Quarkus</code></td></tr>
+      <tr><td>Instalar</td><td><strong>Quarkus Tools</strong> (publisher: Red Hat)</td></tr>
+    </table>
+  </div>
+
+  <div class="passo">
+    <div class="passo-head"><span class="passo-num">2</span><h2>Abrir a paleta de comandos</h2></div>
+    <p class="explica">É por ela que se acessa qualquer comando da extensão.</p>
+    <pre>Ctrl + Shift + P</pre>
+  </div>
+
+  <div class="passo">
+    <div class="passo-head"><span class="passo-num">3</span><h2>Executar o comando de criação</h2></div>
+    <p class="explica">Digite o nome do comando e selecione-o na lista:</p>
+    <pre>Quarkus: Create a Quarkus Project</pre>
+  </div>
+
+  <div class="passo">
+    <div class="passo-head"><span class="passo-num">4</span><h2>Responder ao assistente (wizard)</h2></div>
+    <p class="explica">O VSCode vai perguntar, em sequência, os dados do projeto:</p>
+    <table>
+      <tr><th>Pergunta</th><th>O que escolher</th></tr>
+      <tr><td>Gerenciador de build</td><td><code>MAVEN</code></td></tr>
+      <tr><td>Group Id</td><td><code>org.acme</code></td></tr>
+      <tr><td>Artifact Id</td><td>nome do projeto, ex: <code>quarkus-getting-started</code></td></tr>
+      <tr><td>Versão</td><td>manter <code>1.0.0-SNAPSHOT</code></td></tr>
+      <tr><td>Nome do pacote</td><td><code>org.acme</code></td></tr>
+      <tr><td>Versão do Quarkus</td><td>manter a sugerida (LTS)</td></tr>
+    </table>
+  </div>
+
+  <div class="passo">
+    <div class="passo-head"><span class="passo-num">5</span><h2>Selecionar as dependências (extensions)</h2></div>
+    <p class="explica">Esta é a etapa mais importante: aqui você escolhe o que o projeto vai poder fazer. Para reproduzir os exercícios de REST, REST Client e JWT, marque:</p>
+    <ul class="checklist">
+      <li><code>RESTEasy Reactive</code> <span class="old">(quarkus-rest)</span> — criar endpoints REST (recursos com @Path, @GET, etc.)</li>
+      <li><code>RESTEasy Reactive Jackson</code> <span class="old">(quarkus-rest-jackson)</span> — conversão automática para/de JSON</li>
+      <li><code>REST Client Reactive</code> <span class="old">(quarkus-rest-client)</span> — consumir APIs externas (interfaces com @RegisterRestClient)</li>
+      <li><code>REST Client Reactive Jackson</code> <span class="old">(quarkus-rest-client-jackson)</span> — JSON também no lado cliente</li>
+      <li><code>SmallRye JWT</code> <span class="old">(quarkus-smallrye-jwt)</span> — validar tokens recebidos (necessário para @RolesAllowed)</li>
+      <li><code>SmallRye JWT Build</code> <span class="old">(quarkus-smallrye-jwt-build)</span> — gerar tokens dentro da própria aplicação</li>
+    </ul>
+    <div class="caixa"><strong>Nota:</strong> nas versões atuais do Quarkus (3.9+), as extensões REST reativas foram renomeadas — a busca no VSCode ainda aceita os nomes antigos, mas o <code>pom.xml</code> gerado usa os artifactIds novos mostrados entre parênteses acima. Funcionalmente é o mesmo conjunto de dependências.</div>
+    <div class="caixa"><strong>Dica:</strong> não se preocupe em acertar tudo de uma vez — qualquer extensão pode ser adicionada depois editando o <code>pom.xml</code> ou rodando <code>./mvnw quarkus:add-extension -Dextensions="nome-da-extensao"</code>.</div>
+  </div>
+
+  <div class="passo">
+    <div class="passo-head"><span class="passo-num">6</span><h2>Escolher a pasta de destino</h2></div>
+    <p class="explica">Selecione em qual pasta do seu sistema de arquivos o projeto será criado. O VSCode gera a estrutura completa (pom.xml, src/main/java, src/main/resources, etc.).</p>
+  </div>
+
+  <div class="passo">
+    <div class="passo-head"><span class="passo-num">7</span><h2>Abrir e rodar o projeto</h2></div>
+    <p class="explica">O VSCode abre a pasta do projeto automaticamente. No terminal integrado (<code>Ctrl+`</code>), rode:</p>
+    <pre>./mvnw compile quarkus:dev</pre>
+    <p class="explica">O modo dev fica escutando alterações no código e recarrega automaticamente. Acesse no navegador:</p>
+    <pre>http://localhost:8080</pre>
+    <div class="caixa"><strong>Bônus:</strong> com o app rodando em modo dev, abra <code>http://localhost:8080/q/dev</code> para ver a Dev UI — um painel visual com todas as extensões instaladas, endpoints REST detectados e ferramentas de depuração.</div>
+  </div>
+
+  <div class="alternativa">
+    <h3>Alternativa sem VSCode: code.quarkus.io</h3>
+    <p>Se preferir não usar o wizard da extensão, acesse <strong>code.quarkus.io</strong>, marque as mesmas dependências do Passo 5, clique em "Generate your application" e baixe o <code>.zip</code>. Depois é só descompactar e abrir a pasta no VSCode — o restante (Passo 7 em diante) é idêntico.</p>
+  </div>
+
+  <footer>
+    Guia de estudo pessoal — modelo didático inspirado em pw2.rpmhub.dev · imprima ou salve como PDF pelo botão no topo.
+  </footer>
+
+</div>
+
+</body></html>
