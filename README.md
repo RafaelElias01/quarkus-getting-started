@@ -29,7 +29,3 @@ Endereços:
 - Readiness: http://localhost:8080/q/health/ready
 - Todos os checks: http://localhost:8080/q/health
 - Interface web (só em modo dev): http://localhost:8080/q/health-ui/
-
-Para ver o exercício 5 falhar, troque temporariamente a URL do `IUserClient` por uma porta sem serviço, por exemplo: `-Dorg.acme.IUserClient/mp-rest/url=http://localhost:9999`. Com isso `ReadyCatalog` fica `DOWN`.
-
-Enquanto `ReadyDown` existir, `/q/health/ready` responde 503.
