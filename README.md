@@ -38,6 +38,30 @@ Exemplo de resposta de `/q/health/ready` com `ReadyDown` ativo:
 
 Com `ReadyDown` ativo, o status geral fica `DOWN` e o endpoint responde 503.
 
+## Respostas de cada exercício
+
+Exercício 1 (`/q/health/live`, HTTP 200):
+
+```json
+{"status":"UP","checks":[{"name":"alive","status":"UP"}]}
+```
+
+Exercício 2 (`/q/health/ready`, HTTP 503): é o exemplo mostrado acima, com `ready-down` em `DOWN`.
+
+Exercícios 3 e 4 (`/q/health`, HTTP 503, com todos os checks):
+
+```json
+{"status":"DOWN","checks":[{"name":"alive","status":"UP"},{"name":"ready","status":"UP","data":{"version":"1.0.0"}},{"name":"ready-down","status":"DOWN"},{"name":"catalog-service","status":"UP"}]}
+```
+
+Exercício 5 com o serviço fora do ar (`/q/health/ready`, HTTP 503):
+
+```json
+{"status":"DOWN","checks":[{"name":"catalog-service","status":"DOWN"},{"name":"ready","status":"UP","data":{"version":"1.0.0"}},{"name":"ready-down","status":"DOWN"}]}
+```
+
+Exercício 5 com o serviço no ar: o `catalog-service` aparece `UP` no mesmo endpoint, como no exemplo acima.
+
 ## Testar o exercício 5 com o serviço fora do ar
 
 ```powershell
