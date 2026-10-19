@@ -29,3 +29,11 @@ Endereços:
 - Readiness: http://localhost:8080/q/health/ready
 - Todos os checks: http://localhost:8080/q/health
 - Interface web (só em modo dev): http://localhost:8080/q/health-ui/
+
+Exemplo de resposta de `/q/health/ready` com `ReadyDown` ativo:
+
+```json
+{"status":"DOWN","checks":[{"name":"ready","status":"UP","data":{"version":"1.0.0"}},{"name":"ready-down","status":"DOWN"},{"name":"catalog-service","status":"UP"}]}
+```
+
+Com `ReadyDown` ativo, o status geral fica `DOWN` e o endpoint responde 503.
