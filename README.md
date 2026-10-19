@@ -21,7 +21,7 @@ A extensão de health está no [pom.xml](pom.xml): `quarkus-smallrye-health`.
 Rodar em modo desenvolvimento:
 
 ```shell script
-./mvnw compile quarkus:dev
+mvn compile quarkus:dev
 ```
 
 Endereços:
@@ -61,7 +61,7 @@ Exercício 5 com o serviço no ar: o `catalog-service` aparece `UP` no mesmo end
 ## Testar o exercício 5 com o serviço fora do ar
 
 ```powershell
-.\mvnw quarkus:dev "-Dorg.acme.IUserClient/mp-rest/url=http://localhost:9999"
+mvn quarkus:dev "-Dorg.acme.IUserClient/mp-rest/url=http://localhost:9999"
 ```
 
 Abra http://localhost:8080/q/health/ready e veja a linha `catalog-service`: ela deve estar `DOWN`.
