@@ -37,3 +37,11 @@ Exemplo de resposta de `/q/health/ready` com `ReadyDown` ativo:
 ```
 
 Com `ReadyDown` ativo, o status geral fica `DOWN` e o endpoint responde 503.
+
+## Testar o exercício 5 com o serviço fora do ar
+
+```powershell
+.\mvnw quarkus:dev "-Dorg.acme.IUserClient/mp-rest/url=http://localhost:9999"
+```
+
+Abra http://localhost:8080/q/health/ready e veja a linha `catalog-service`: ela deve estar `DOWN`.
