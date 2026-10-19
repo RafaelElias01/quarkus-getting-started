@@ -30,14 +30,6 @@ Endereços:
 - Todos os checks: http://localhost:8080/q/health
 - Interface web (só em modo dev): http://localhost:8080/q/health-ui/
 
-Exemplo de resposta de `/q/health/ready` com `ReadyDown` ativo:
-
-```json
-{"status":"DOWN","checks":[{"name":"ready","status":"UP","data":{"version":"1.0.0"}},{"name":"ready-down","status":"DOWN"},{"name":"catalog-service","status":"UP"}]}
-```
-
-Com `ReadyDown` ativo, o status geral fica `DOWN` e o endpoint responde 503.
-
 ## Respostas de cada exercício
 
 Exercício 1 (`/q/health/live`, HTTP 200):
@@ -46,7 +38,11 @@ Exercício 1 (`/q/health/live`, HTTP 200):
 {"status":"UP","checks":[{"name":"alive","status":"UP"}]}
 ```
 
-Exercício 2 (`/q/health/ready`, HTTP 503): é o exemplo mostrado acima, com `ready-down` em `DOWN`.
+Exercício 2 (`/q/health/ready`, HTTP 503):
+
+```json
+{"status":"DOWN","checks":[{"name":"ready","status":"UP","data":{"version":"1.0.0"}},{"name":"ready-down","status":"DOWN"},{"name":"catalog-service","status":"UP"}]}
+```
 
 Exercícios 3 e 4 (`/q/health`, HTTP 503, com todos os checks):
 
